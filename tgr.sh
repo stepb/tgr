@@ -43,14 +43,14 @@ tgr_sync() {
        ## no local mods
         if ! git branch | grep '.\+' ||
             ! git log origin/master...HEAD 2>&1 | grep '.\+'; then
-           ## no new commits
+           ## no local commits
             if git fetch 2>&1 | grep '.\+'; then
                 git pull || exit 1
             else
                 echo " Nothing to sync!"
             fi
         else
-           ## new commits
+           ## local commits
             git_fetch_and_maybe_rebase || exit 1
             git push origin master || exit 1
         fi
