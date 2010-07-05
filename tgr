@@ -27,6 +27,12 @@ usage() {
     exit 1
 }
 
+git_fetch_and_maybe_rebase() {
+    if git fetch 2>&1 | grep '.\+'; then
+        git rebase origin/master || return 1
+    fi
+}
+
 ###################################
 ### Top level functions         ###
 ###################################
@@ -34,14 +40,26 @@ usage() {
 ## [<commit-message>]
 tgr_sync() {
     if ! git status --porcelain | grep '.\+'; then
-        git pull
+       ## no local mods
+        if ! git branch | grep '.\+' ||
+            ! git log origin/master...HEAD 2>&1 | grep '.\+'; then
+           ## no new commits
+            if git fetch 2>&1 | grep '.\+'; then
+                git pull || exit 1
+            else
+                echo " Nothing to sync!"
+            fi
+        else
+           ## new commits
+            git_fetch_and_maybe_rebase || exit 1
+            git push origin master || exit 1
+        fi
     else
+       ## local mods
         git add -A || exit 1
         [ "$1" ] && local cmsg="$1" || local cmsg="`date`"
         git commit -m "$cmsg" || exit 1
-        if git fetch 2>&1 | grep '.\+'; then
-            git rebase origin/master || exit 1
-        fi
+        git_fetch_and_maybe_rebase || exit 1
         git push origin master || exit 1
     fi
 }

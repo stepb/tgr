@@ -96,8 +96,18 @@ sync_local_mods_test() {
     "$tgr" -s || fail_test
 }
 
+sync_commits_no_local_mods_nothing_to_sync_test() {
+    begin_test "sync_commits_no_local_mods_nothing_to_sync_test"
+    do_work proj-c1 c1.work "work work work"
+    cd proj-c1
+    git add c1.work
+    git commit -m "work" > /dev/null
+    "$tgr" -s || fail_test
+}
+
 create_res
 sync_nothing_to_sync_test
 sync_no_local_mods_test
 sync_local_mods_nothing_to_sync_test
 sync_local_mods_test
+sync_commits_no_local_mods_nothing_to_sync_test
