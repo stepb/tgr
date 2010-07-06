@@ -27,6 +27,17 @@ usage() {
     exit 1
 }
 
+error_if_not_inside_work_tree() {
+    if [ "$(git rev-parse --is-inside-work-tree)" != "true" ]; then
+        echo " You do not appear to be inside a git working tree!"
+        exit 1
+    fi
+}
+
+cd_to_top_level() {
+    cd "$(git rev-parse --show-cdup)"
+}
+
 git_fetch_and_maybe_rebase() {
     if git fetch 2>&1 | grep '.\+'; then
         git rebase origin/master || return 1
@@ -39,6 +50,8 @@ git_fetch_and_maybe_rebase() {
 
 ## [<commit-message>]
 tgr_sync() {
+    error_if_not_inside_work_tree
+    cd_to_top_level
     if ! git status --porcelain | grep '.\+'; then
        ## no local mods
         if ! git branch | grep '.\+' ||
