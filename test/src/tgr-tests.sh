@@ -1,7 +1,7 @@
 #!/bin/bash
 
 testdir="$PWD/`dirname $0`/.."
-tgr="$testdir/../tgr"
+tgr="$testdir/../tgr.sh"
 res="$testdir/res"
 work="$testdir/work"
 
